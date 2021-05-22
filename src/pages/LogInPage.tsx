@@ -13,8 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import {Link as RouterLink, useHistory} from "react-router-dom";
 import {Link as MaterialLink} from "@material-ui/core";
-import ILogIn from "../interfaces/ILogIn";
 import ILogInResponsible from "../interfaces/ILogInResponsible";
+import {IBackendable} from "../interfaces/IBackendable";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -49,18 +49,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
-export const LogInPage : React.FC<ILogIn> = props => {
+export const LogInPage: React.FC<IBackendable> = props => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [savePass , setSavePass] = useState(false);
+    const [savePass, setSavePass] = useState(false);
     const history = useHistory();
 
-    function setCookie(name : string, value: string, days : number) : void {
-        let expires : string = "";
+    function setCookie(name: string, value: string, days: number): void {
+        let expires: string = "";
         if (days) {
-            let date : Date = new Date();
+            let date: Date = new Date();
             date.setTime(date.getTime() + (days*24*60*60*1000));
             expires = "; expires=" + date.toUTCString();
         }
@@ -70,7 +69,7 @@ export const LogInPage : React.FC<ILogIn> = props => {
     function logIn(event : React.SyntheticEvent) : void{
         event.preventDefault();
         console.log(email + " " + password);
-        props.logIn(email, password, new class implements ILogInResponsible {
+        props.backend.logIn(email, password, new class implements ILogInResponsible {
             onFailed(message: string): void {
                 alert(message);
             }
