@@ -1,33 +1,23 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import {useHistory} from "react-router-dom";
+import CookieUtil from "../util/CookieUtil";
 
-export const GroupsPage : React.FC = () => {
+export const GroupsPage: React.FC = () => {
 
-    const history = useHistory();
-    let token;
-    document
-        .cookie
-        .split(";")
-        .map(cookie => {
-            if (cookie.includes("token"))
-                return cookie.split("=")
-                    .map(keyValue => {
-                        if (keyValue !== "token"){
-                            token = keyValue;
-                        }
-                        return null;
-                    })
-            return null;
-        });
+    const cookieUtil = new CookieUtil();
 
-    console.log(token);
-    if (token === undefined){
-        history.replace("/logIn");
+    function checkCookie(history: any) {
+        if (cookieUtil.getCookie("token") === "") {
+            history.replace("/logIn");
+        }
     }
 
+    const history = useHistory();
+    checkCookie(history);
+
     return <div>
-            <h1>GroupPage</h1>
-        </div>
+        <h1>GroupPage</h1>
+    </div>
 }
 
 export default GroupsPage;

@@ -1,9 +1,8 @@
-import ILogInResponsible from "../interfaces/ILogInResponsible";
 import AuthRequestDto from "../dto/auth/AuthRequestDto";
-import AuthResponseDto from "../dto/auth/AuthResponseDto";
 import {IBackendDao} from "./IBackendDao";
-import {IRegisterResponsible} from "../interfaces/IRegisterResponsible";
 import RegisterRequestDto from "../dto/register/RegisterRequestDto";
+import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+
 
 export default class BackendDao implements IBackendDao {
 
@@ -17,58 +16,44 @@ export default class BackendDao implements IBackendDao {
         this.baseUrl = "http://192.168.0.110:8080/api/v1/";
     }
 
-    public logIn(email: string, password: string, responsible: ILogInResponsible): void {
-        this.bcrypt.hash(password.trim(), this.salt, (err: any, hash: any) => {
-            console.log(hash + " " + err);
-            const requestDto: AuthRequestDto = new AuthRequestDto(email, hash);
-            return this.sendLogInRequest(requestDto, responsible);
-        });
+    public hashPassword(password: string): string {
+        return this.bcrypt.hashSync(password, this.salt);
     }
 
-    public register(email: string, password: string, name: string, surname: string, response: IRegisterResponsible): void {
+    public logIn(email: string, password: string, responsible: IHttpResponsible, hashPass: boolean): void {
+        if (hashPass) {
+            this.bcrypt.hash(password.trim(), this.salt, (err: any, hash: any) => {
+                console.log(hash + " " + err);
+                const requestDto: AuthRequestDto = new AuthRequestDto(email, hash);
+                return this.sendRequest("auth/login", requestDto, responsible);
+            });
+        } else {
+            const requestDto: AuthRequestDto = new AuthRequestDto(email, password);
+            return this.sendRequest("auth/login", requestDto, responsible);
+        }
+
+    }
+
+    public register(email: string, password: string, name: string, surname: string, responsible: IHttpResponsible): void {
         this.bcrypt.hash(password.trim(), this.salt, (err: any, hash: any) => {
             console.log(hash + " " + err);
             const requestDto: RegisterRequestDto = new RegisterRequestDto(email, hash, name, surname);
-            return this.sendRegisterRequest(requestDto, response);
+            return this.sendRequest("auth/login", requestDto, responsible);
         });
     }
 
-    private sendLogInRequest(request: AuthRequestDto, responsible: ILogInResponsible): void {
-        let httpRequest: XMLHttpRequest = new XMLHttpRequest();
-        let responseDto: AuthResponseDto;
-        httpRequest.open("POST", this.baseUrl + "auth/login", true);
-        httpRequest.setRequestHeader("Content-Type", "application/json");
-        httpRequest.setRequestHeader("Access-Control-Allow-Origin", "*");
-        httpRequest.send(JSON.stringify(request))
-        httpRequest.onreadystatechange = () => {
-            if (httpRequest.readyState === 4) {
-                if (httpRequest.status !== 200) {
-                    responsible.onFailed("Неверный логин или пароль");
-                } else {
-                    responseDto = JSON.parse(httpRequest.response);
-                    responsible.onSuccess(responseDto.email, request.password, responseDto.token);
-                }
-            }
-        }
-    }
 
-
-    private sendRegisterRequest(requestDto: RegisterRequestDto, response: IRegisterResponsible) {
+    private sendRequest(path: string, requestDto: any, response: IHttpResponsible) {
         let httpRequest: XMLHttpRequest = new XMLHttpRequest();
-        let responseDto: AuthResponseDto;
-        httpRequest.open("POST", this.baseUrl + "auth/register", true);
+        httpRequest.open("POST", this.baseUrl + path, true);
         httpRequest.setRequestHeader("Content-Type", "application/json");
         httpRequest.setRequestHeader("Access-Control-Allow-Origin", "*");
         httpRequest.send(JSON.stringify(requestDto))
         httpRequest.onreadystatechange = () => {
             if (httpRequest.readyState === 4) {
-                if (httpRequest.status !== 200) {
-                    response.onFailed("Неверный логин или пароль", httpRequest.status);
-                } else {
-                    responseDto = JSON.parse(httpRequest.response);
-                    response.onSuccess(responseDto.email, requestDto.password);
-                }
+                response.onResponse(httpRequest.status, httpRequest.response);
             }
         }
     }
+
 }

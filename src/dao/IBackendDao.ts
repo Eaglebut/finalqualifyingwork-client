@@ -1,10 +1,12 @@
-import ILogInResponsible from "../interfaces/ILogInResponsible";
-import {IRegisterResponsible} from "../interfaces/IRegisterResponsible";
+import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 
 export interface IBackendDao {
-    logIn(email: string, password: string, responsible: ILogInResponsible): void;
 
-    //logOut() : void;
-    register(email: string, password: string, name: string, surname: string, response: IRegisterResponsible): void;
+    hashPassword(password: string): string
+
+    logIn(email: string, password: string, responsible: IHttpResponsible, hashPass: boolean): void;
+
+    register(email: string, password: string, name: string, surname: string, responsible: IHttpResponsible): void;
+
 
 }

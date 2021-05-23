@@ -12,7 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {IBackendable} from "../interfaces/IBackendable";
-import {IRegisterResponsible} from "../interfaces/IRegisterResponsible";
+import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+import CookieUtil from "../util/CookieUtil";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -44,23 +45,34 @@ export const RegisterPage: React.FC<IBackendable> = (props) => {
     const [repeatedPassword, setRepeatedPassword] = useState('');
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
-
+    const cookieUtil = new CookieUtil();
     const history = useHistory();
 
 
     function register(event: React.SyntheticEvent) {
         event.preventDefault();
         console.log(email, password, name, surname);
-        props.backend.register(email, password, name, surname, new class implements IRegisterResponsible {
-            onSuccess(email: string, password: string) {
-                history.push("/login");
-            }
-
-            onFailed(message: string, code: number) {
-                alert(code + " " + message);
-            }
-        }());
+        props.backend.register(email, password, name, surname,
+            new class implements IHttpResponsible {
+                onResponse(code: number, response: any) {
+                    if (code === 200) {
+                        history.push("/login");
+                    } else if (code === 400) {
+                        alert("invalid user");
+                    } else {
+                        alert("unexpected error" + code);
+                    }
+                }
+            }());
     }
+
+    function checkCookie(history: any) {
+        if (cookieUtil.getCookie("token") !== "") {
+            history.replace("/");
+        }
+    }
+
+    checkCookie(history);
 
     return (
         <Container component="main" maxWidth="xs">

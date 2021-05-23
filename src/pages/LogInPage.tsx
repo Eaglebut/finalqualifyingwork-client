@@ -13,8 +13,10 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import {Link as RouterLink, useHistory} from "react-router-dom";
 import {Link as MaterialLink} from "@material-ui/core";
-import ILogInResponsible from "../interfaces/ILogInResponsible";
 import {IBackendable} from "../interfaces/IBackendable";
+import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+import AuthResponseDto from "../dto/auth/AuthResponseDto";
+import CookieUtil from "../util/CookieUtil";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -55,63 +57,72 @@ export const LogInPage: React.FC<IBackendable> = props => {
     const [password, setPassword] = useState('');
     const [savePass, setSavePass] = useState(false);
     const history = useHistory();
+    const cookieUtil = new CookieUtil();
 
-    function setCookie(name: string, value: string, days: number): void {
-        let expires: string = "";
-        if (days) {
-            let date: Date = new Date();
-            date.setTime(date.getTime() + (days*24*60*60*1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-    }
 
-    function logIn(event : React.SyntheticEvent) : void{
+    function onSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
-        console.log(email + " " + password);
-        props.backend.logIn(email, password, new class implements ILogInResponsible {
-            onFailed(message: string): void {
-                alert(message);
-            }
-
-            onSuccess(email: string, password: string, token: string): void {
-                if (savePass) {
-                    setCookie("email", email, 2);
-                    setCookie("pass", password, 2);
-                }
-                setCookie("token", token, 1);
-                history.push("/")
-            }
-        }());
+        logIn(true);
     }
 
+    function logIn(hashPass: boolean): void {
+        console.log(email + " " + password);
+        props.backend.logIn(email, password, new class implements IHttpResponsible {
+            onResponse(code: number, response: any) {
+                if (code !== 200) {
+                    alert("Неверный email/пароль");
+                } else {
+                    let responseDao: AuthResponseDto = JSON.parse(response);
+                    if (savePass) {
+                        cookieUtil.setCookie("email", email, 2);
+                        cookieUtil.setCookie("pass", props.backend.hashPassword(password), 2);
+                    }
+                    cookieUtil.setCookie("token", responseDao.token, 1);
+                    history.push("/")
+                }
+            }
+        }(), hashPass);
+    }
+
+
+    function checkCookie(history: any) {
+        const token = cookieUtil.getCookie("token");
+        if (token !== "") {
+            history.replace("/");
+        } else if (cookieUtil.getCookie("email") !== "" && cookieUtil.getCookie("pass") !== "") {
+            logIn(false);
+        }
+    }
 
 
     const classes = useStyles();
 
+    checkCookie(history);
+
+
     return (
-            <Grid container component="main" className={classes.root}>
-                <CssBaseline />
-                <Grid item xs={false} sm={4} md={7} className={classes.image} />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <div className={classes.paper}>
-                        <Avatar className={classes.avatar}>
-                            <LockOutlinedIcon />
+        <Grid container component="main" className={classes.root}>
+            <CssBaseline/>
+            <Grid item xs={false} sm={4} md={7} className={classes.image}/>
+            <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                <div className={classes.paper}>
+                    <Avatar className={classes.avatar}>
+                        <LockOutlinedIcon/>
                         </Avatar>
-                        <Typography component="h1" variant="h5">
-                            Вход
-                        </Typography>
-                        <form className={classes.form} onSubmit={logIn} noValidate>
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="email"
-                                label="Адресс электронной почты"
-                                name="email"
-                                autoComplete="email"
-                                autoFocus
+                    <Typography component="h1" variant="h5">
+                        Вход
+                    </Typography>
+                    <form className={classes.form} onSubmit={onSubmit} noValidate>
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Адресс электронной почты"
+                            name="email"
+                            autoComplete="email"
+                            autoFocus
                                 onChange={event => setEmail(event.target.value)}
                             />
                             <TextField

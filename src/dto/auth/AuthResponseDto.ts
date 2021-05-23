@@ -5,5 +5,6 @@ export default class AuthResponseDto {
         this.token = token;
     }
     email : string;
-    token : string
+    token: string
+    password ?: string;
 }
