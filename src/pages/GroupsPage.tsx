@@ -1,6 +1,7 @@
 import React from "react";
 import {useHistory} from "react-router-dom";
 import CookieUtil from "../util/CookieUtil";
+import MainAppBar from "../elements/MainAppBar";
 
 export const GroupsPage: React.FC = () => {
 
@@ -16,6 +17,7 @@ export const GroupsPage: React.FC = () => {
     checkCookie(history);
 
     return <div>
+        <MainAppBar/>
         <h1>GroupPage</h1>
     </div>
 }

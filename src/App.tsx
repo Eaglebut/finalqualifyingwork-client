@@ -21,9 +21,14 @@ function App() {
                         <RegisterPage backend={backend}/>
                     </Route>
                     <Route path="/" exact>
-                    <GroupsPage/>
-                </Route>
-            </Switch>
+                        <GroupsPage/>
+                    </Route>
+                    <Route path="/user" exact>
+                        <h1>
+                            USER PAGE
+                        </h1>
+                    </Route>
+                </Switch>
         </Router>
     </div>
   );

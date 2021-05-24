@@ -1,4 +1,4 @@
-import {IBackendDao} from "../dao/IBackendDao";
+import {IBackendDao} from "./IBackendDao";
 
 export interface IBackendable {
     backend: IBackendDao;

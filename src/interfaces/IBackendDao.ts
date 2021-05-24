@@ -1,4 +1,4 @@
-import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+import {IHttpResponsible} from "./IHttpResponsible";
 
 export interface IBackendDao {
 

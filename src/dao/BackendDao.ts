@@ -1,5 +1,5 @@
 import AuthRequestDto from "../dto/auth/AuthRequestDto";
-import {IBackendDao} from "./IBackendDao";
+import {IBackendDao} from "../interfaces/IBackendDao";
 import RegisterRequestDto from "../dto/register/RegisterRequestDto";
 import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 
