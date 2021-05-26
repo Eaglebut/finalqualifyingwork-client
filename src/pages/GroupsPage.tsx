@@ -1,9 +1,9 @@
 import React from "react";
 import {useHistory} from "react-router-dom";
-import {MainAppBar} from "../elements/MainAppBar";
+import {MainAppBar} from "../elements/appbar/MainAppBar";
 import {IBackendable} from "../interfaces/IBackendable";
 import {getCookie} from "../util/CookieUtil";
-import {GroupElement} from "../elements/GroupElement";
+import {GroupList} from "../elements/group_page/GroupList";
 
 export const GroupsPage: React.FC<IBackendable> = (props) => {
 
@@ -19,7 +19,7 @@ export const GroupsPage: React.FC<IBackendable> = (props) => {
 
     return (<div>
         <MainAppBar backend={props.backend}/>
-        <GroupElement backend={props.backend}/>
+        <GroupList backend={props.backend}/>
     </div>);
 }
 

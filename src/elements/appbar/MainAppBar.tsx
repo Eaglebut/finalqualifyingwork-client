@@ -9,11 +9,11 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import {AppMenu} from "./AppMenu";
 import {MobileAppMenu} from "./MobileAppMenu";
-import {IBackendable} from "../interfaces/IBackendable";
+import {IBackendable} from "../../interfaces/IBackendable";
 import {Avatar} from "@material-ui/core";
-import User from "../model/User";
-import {getCookie} from "../util/CookieUtil";
-import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+import User from "../../model/User";
+import {getCookie} from "../../util/CookieUtil";
+import {IHttpResponsible} from "../../interfaces/IHttpResponsible";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

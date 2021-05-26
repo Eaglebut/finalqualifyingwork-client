@@ -2,6 +2,7 @@ import AuthRequestDto from "../dto/auth/AuthRequestDto";
 import {IBackendDao} from "../interfaces/IBackendDao";
 import RegisterRequestDto from "../dto/register/RegisterRequestDto";
 import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+import PostGroupDto from "../dto/group/PostGroupDto";
 
 
 export default class BackendDao implements IBackendDao {
@@ -46,6 +47,14 @@ export default class BackendDao implements IBackendDao {
         this.sendRequest("GET", "user", null, response, token);
     }
 
+    getUsersGroups(token: string, response: IHttpResponsible): void {
+        this.sendRequest("GET", "group", null, response, token);
+    }
+
+    createGroup(token: string, dto: PostGroupDto, response: IHttpResponsible): void {
+        this.sendRequest("POST", "group", dto, response, token);
+    }
+
     private sendRequest(method: string, path: string, requestDto: any, response: IHttpResponsible, token: string | null) {
         let httpRequest: XMLHttpRequest = new XMLHttpRequest();
         httpRequest.open(method, this.baseUrl + path, true);
@@ -56,7 +65,11 @@ export default class BackendDao implements IBackendDao {
         httpRequest.send(JSON.stringify(requestDto))
         httpRequest.onreadystatechange = () => {
             if (httpRequest.readyState === 4) {
-                console.log(httpRequest.response);
+                console.log("method : " + method
+                    + " token: " + token
+                    + " path: " + path
+                    + " requestDto: " + requestDto
+                    + " response: " + httpRequest.response);
                 response.onResponse(httpRequest.status, httpRequest.response);
             }
         }
