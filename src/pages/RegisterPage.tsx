@@ -13,7 +13,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {IBackendable} from "../interfaces/IBackendable";
 import {IHttpResponsible} from "../interfaces/IHttpResponsible";
-import CookieUtil from "../util/CookieUtil";
+import {getCookie} from "../util/CookieUtil";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -45,7 +45,6 @@ export const RegisterPage: React.FC<IBackendable> = (props) => {
     const [repeatedPassword, setRepeatedPassword] = useState('');
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
-    const cookieUtil = new CookieUtil();
     const history = useHistory();
 
 
@@ -67,7 +66,7 @@ export const RegisterPage: React.FC<IBackendable> = (props) => {
     }
 
     function checkCookie(history: any) {
-        if (cookieUtil.getCookie("token") !== "") {
+        if (getCookie("token") !== "") {
             history.replace("/");
         }
     }

@@ -8,5 +8,7 @@ export interface IBackendDao {
 
     register(email: string, password: string, name: string, surname: string, responsible: IHttpResponsible): void;
 
+    getUser(token: string, response: IHttpResponsible): void;
 
+    getUsersGroups(token: string, response: IHttpResponsible): void;
 }

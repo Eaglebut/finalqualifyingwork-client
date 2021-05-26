@@ -16,7 +16,7 @@ import {Link as MaterialLink} from "@material-ui/core";
 import {IBackendable} from "../interfaces/IBackendable";
 import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 import AuthResponseDto from "../dto/auth/AuthResponseDto";
-import CookieUtil from "../util/CookieUtil";
+import {getCookie, setCookie} from "../util/CookieUtil";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -57,7 +57,6 @@ export const LogInPage: React.FC<IBackendable> = props => {
     const [password, setPassword] = useState('');
     const [savePass, setSavePass] = useState(false);
     const history = useHistory();
-    const cookieUtil = new CookieUtil();
 
 
     function onSubmit(event: React.SyntheticEvent) {
@@ -74,10 +73,10 @@ export const LogInPage: React.FC<IBackendable> = props => {
                 } else {
                     let responseDao: AuthResponseDto = JSON.parse(response);
                     if (savePass) {
-                        cookieUtil.setCookie("email", email, 2);
-                        cookieUtil.setCookie("pass", props.backend.hashPassword(password), 2);
+                        setCookie("email", email, 2);
+                        setCookie("pass", props.backend.hashPassword(password), 2);
                     }
-                    cookieUtil.setCookie("token", responseDao.token, 1);
+                    setCookie("token", responseDao.token, 1);
                     history.push("/")
                 }
             }
@@ -86,10 +85,10 @@ export const LogInPage: React.FC<IBackendable> = props => {
 
 
     function checkCookie(history: any) {
-        const token = cookieUtil.getCookie("token");
+        const token = getCookie("token");
         if (token !== "") {
             history.replace("/");
-        } else if (cookieUtil.getCookie("email") !== "" && cookieUtil.getCookie("pass") !== "") {
+        } else if (getCookie("email") !== "" && getCookie("pass") !== "") {
             logIn(false);
         }
     }

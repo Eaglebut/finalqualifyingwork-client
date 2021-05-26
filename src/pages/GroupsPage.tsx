@@ -1,14 +1,15 @@
 import React from "react";
 import {useHistory} from "react-router-dom";
-import CookieUtil from "../util/CookieUtil";
-import MainAppBar from "../elements/MainAppBar";
+import {MainAppBar} from "../elements/MainAppBar";
+import {IBackendable} from "../interfaces/IBackendable";
+import {getCookie} from "../util/CookieUtil";
+import {GroupElement} from "../elements/GroupElement";
 
-export const GroupsPage: React.FC = () => {
+export const GroupsPage: React.FC<IBackendable> = (props) => {
 
-    const cookieUtil = new CookieUtil();
 
     function checkCookie(history: any) {
-        if (cookieUtil.getCookie("token") === "") {
+        if (getCookie("token") === "") {
             history.replace("/logIn");
         }
     }
@@ -16,10 +17,10 @@ export const GroupsPage: React.FC = () => {
     const history = useHistory();
     checkCookie(history);
 
-    return <div>
-        <MainAppBar/>
-        <h1>GroupPage</h1>
-    </div>
+    return (<div>
+        <MainAppBar backend={props.backend}/>
+        <GroupElement backend={props.backend}/>
+    </div>);
 }
 
 export default GroupsPage;

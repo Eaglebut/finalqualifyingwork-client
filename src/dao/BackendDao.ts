@@ -25,11 +25,11 @@ export default class BackendDao implements IBackendDao {
             this.bcrypt.hash(password.trim(), this.salt, (err: any, hash: any) => {
                 console.log(hash + " " + err);
                 const requestDto: AuthRequestDto = new AuthRequestDto(email, hash);
-                return this.sendRequest("auth/login", requestDto, responsible);
+                return this.sendRequest("POST", "auth/login", requestDto, responsible, null);
             });
         } else {
             const requestDto: AuthRequestDto = new AuthRequestDto(email, password);
-            return this.sendRequest("auth/login", requestDto, responsible);
+            return this.sendRequest("POST", "auth/login", requestDto, responsible, null);
         }
 
     }
@@ -38,19 +38,25 @@ export default class BackendDao implements IBackendDao {
         this.bcrypt.hash(password.trim(), this.salt, (err: any, hash: any) => {
             console.log(hash + " " + err);
             const requestDto: RegisterRequestDto = new RegisterRequestDto(email, hash, name, surname);
-            return this.sendRequest("auth/login", requestDto, responsible);
+            return this.sendRequest("POST", "auth/login", requestDto, responsible, null);
         });
     }
 
+    public getUser(token: string, response: IHttpResponsible): void {
+        this.sendRequest("GET", "user", null, response, token);
+    }
 
-    private sendRequest(path: string, requestDto: any, response: IHttpResponsible) {
+    private sendRequest(method: string, path: string, requestDto: any, response: IHttpResponsible, token: string | null) {
         let httpRequest: XMLHttpRequest = new XMLHttpRequest();
-        httpRequest.open("POST", this.baseUrl + path, true);
+        httpRequest.open(method, this.baseUrl + path, true);
         httpRequest.setRequestHeader("Content-Type", "application/json");
         httpRequest.setRequestHeader("Access-Control-Allow-Origin", "*");
+        if (token !== null)
+            httpRequest.setRequestHeader("Authorization", token);
         httpRequest.send(JSON.stringify(requestDto))
         httpRequest.onreadystatechange = () => {
             if (httpRequest.readyState === 4) {
+                console.log(httpRequest.response);
                 response.onResponse(httpRequest.status, httpRequest.response);
             }
         }

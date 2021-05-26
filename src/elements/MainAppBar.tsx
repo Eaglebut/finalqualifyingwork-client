@@ -1,24 +1,24 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createStyles, makeStyles, Theme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
-import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import {AppMenu} from "./AppMenu";
 import {MobileAppMenu} from "./MobileAppMenu";
-import {ProfileCard} from "./ProfileCard";
+import {IBackendable} from "../interfaces/IBackendable";
+import {Avatar} from "@material-ui/core";
+import User from "../model/User";
+import {getCookie} from "../util/CookieUtil";
+import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         grow: {
             flexGrow: 1,
-        },
-        menuButton: {
-            marginRight: theme.spacing(2),
         },
         title: {
             display: 'none',
@@ -54,10 +54,21 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function MainAppBar() {
+export const MainAppBar: React.FC<IBackendable> = (props) => {
     const classes = useStyles();
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [user, setUser] = React.useState<null | User>(null);
+    useEffect(() => {
+        props.backend.getUser(getCookie("token"), new class implements IHttpResponsible {
+            onResponse(code: number, response: any) {
+                if (code === 200)
+                    setUser(JSON.parse(response));
+            }
+        }(),)
+    }, [props.backend]);
+
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -87,14 +98,6 @@ export default function MainAppBar() {
         <div className={classes.grow}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        edge="start"
-                        className={classes.menuButton}
-                        color="inherit"
-                        aria-label="open drawer"
-                    >
-                        <MenuIcon/>
-                    </IconButton>
                     <Typography className={classes.title} variant="h6" noWrap>
                         Группы
                     </Typography>
@@ -113,7 +116,13 @@ export default function MainAppBar() {
                             onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
-                            <ProfileCard/>
+                            <Avatar>
+                                {
+                                    user === null
+                                        ? "DD"
+                                        : user.name.charAt(0).toUpperCase() + user.surname.charAt(0).toUpperCase()
+                                }
+                            </Avatar>
                         </IconButton>
                     </div>
                     <div className={classes.sectionMobile}>
@@ -132,7 +141,10 @@ export default function MainAppBar() {
             <AppMenu menuId={menuId}
                      isMenuOpen={isMenuOpen}
                      handleMenuClose={handleMenuClose}
-                     anchorEl={anchorEl}/>
+                     anchorEl={anchorEl}
+                     backend={props.backend}
+                     user={user}
+            />
             <MobileAppMenu isMobileMenuOpen={isMobileMenuOpen}
                            mobileMenuId={mobileMenuId}
                            handleMobileMenuClose={handleMobileMenuClose}
