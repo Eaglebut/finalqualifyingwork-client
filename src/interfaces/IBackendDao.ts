@@ -1,4 +1,5 @@
 import {IHttpResponsible} from "./IHttpResponsible";
+import PostGroupDto from "../dto/group/PostGroupDto";
 
 export interface IBackendDao {
 
@@ -11,4 +12,6 @@ export interface IBackendDao {
     getUser(token: string, response: IHttpResponsible): void;
 
     getUsersGroups(token: string, response: IHttpResponsible): void;
+
+    createGroup(token: string, dto: PostGroupDto, response: IHttpResponsible): void;
 }

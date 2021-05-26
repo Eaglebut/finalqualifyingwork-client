@@ -1,13 +1,13 @@
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import React, {useEffect, useState} from "react";
-import IAppMenu from "../interfaces/IAppMenu";
+import IAppMenu from "../../interfaces/IAppMenu";
 import {Avatar, Grid, Link as MaterialLink, Typography} from "@material-ui/core";
 import {Link as RouterLink, useHistory} from "react-router-dom";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
-import {deleteCookie, getCookie} from "../util/CookieUtil";
-import User from "../model/User";
-import {IHttpResponsible} from "../interfaces/IHttpResponsible";
+import {deleteCookie, getCookie} from "../../util/CookieUtil";
+import User from "../../model/User";
+import {IHttpResponsible} from "../../interfaces/IHttpResponsible";
 
 const useStyles = makeStyles(() =>
     createStyles({
