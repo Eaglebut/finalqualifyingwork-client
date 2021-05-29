@@ -3,6 +3,7 @@ import {IBackendDao} from "../interfaces/IBackendDao";
 import RegisterRequestDto from "../dto/register/RegisterRequestDto";
 import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 import PostGroupDto from "../dto/group/PostGroupDto";
+import {CreateTaskDto} from "../dto/task/CreateTaskDto";
 
 
 export default class BackendDao implements IBackendDao {
@@ -53,6 +54,19 @@ export default class BackendDao implements IBackendDao {
 
     createGroup(token: string, dto: PostGroupDto, response: IHttpResponsible): void {
         this.sendRequest("POST", "group", dto, response, token);
+    }
+
+    getGroup(token: string, groupId: number, response: IHttpResponsible): void {
+        this.sendRequest("GET", "group/" + groupId, null, response, token);
+    }
+
+    createTask(token: string, groupId: number, taskGroupId: number, dto: CreateTaskDto, response: IHttpResponsible) {
+        this.sendRequest(
+            "POST",
+            "group/" + groupId + "/taskGroup/" + taskGroupId + "/task",
+            dto,
+            response,
+            token);
     }
 
     private sendRequest(method: string, path: string, requestDto: any, response: IHttpResponsible, token: string | null) {

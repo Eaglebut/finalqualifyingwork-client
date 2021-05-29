@@ -29,7 +29,7 @@ export default class Group {
             json.groupType,
             User.fromJsonToMap(json.memberList),
             Group.fromJSONSet(json.subGroups),
-            TaskGroup.fromJson(json.taskGroups));
+            TaskGroup.fromJsonArray(json.taskGroups));
     }
 
     public static fromJSONArray(json: any): Array<Group> {

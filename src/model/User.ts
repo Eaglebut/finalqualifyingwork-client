@@ -17,12 +17,12 @@ export default class User {
     public static fromJsonToMap(json: any): Map<User, UserRole> {
         let userMap: Map<User, UserRole> = new Map<User, UserRole>();
         Object.keys(json).forEach((key) => {
-            userMap.set(User.fromJson(key), json[key]);
+            userMap.set(User.fromStringJson(key), json[key]);
         })
         return userMap;
     }
 
-    public static fromJson(json: string): User {
+    public static fromStringJson(json: string): User {
         let slicedJson: string = json.slice(14, -1);
         let splitJson: string[] = slicedJson.split(",");
 
@@ -31,6 +31,11 @@ export default class User {
             splitJson[2].split("=")[1],
             splitJson[3].split("=")[1]);
     };
+
+    public static fromJson(json: any): User {
+        return new User(json.id, json.email, json.name, json.surname);
+    }
+
 
     public toString(): string {
         return "User {" +

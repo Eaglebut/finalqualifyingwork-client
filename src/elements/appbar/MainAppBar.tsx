@@ -10,10 +10,11 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import {AppMenu} from "./AppMenu";
 import {MobileAppMenu} from "./MobileAppMenu";
 import {IBackendable} from "../../interfaces/IBackendable";
-import {Avatar} from "@material-ui/core";
+import {Avatar, Fade} from "@material-ui/core";
 import User from "../../model/User";
 import {getCookie} from "../../util/CookieUtil";
 import {IHttpResponsible} from "../../interfaces/IHttpResponsible";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -51,15 +52,26 @@ const useStyles = makeStyles((theme: Theme) =>
                 display: 'none',
             },
         },
+        menuButton: {
+            marginRight: theme.spacing(2),
+        },
     }),
 );
 
-export const MainAppBar: React.FC<IBackendable> = (props) => {
+interface IMainAppBar extends IBackendable {
+    title: string;
+    backButtonVisibility: boolean;
+
+    onBackButtonClick(): void;
+}
+
+export const MainAppBar: React.FC<IMainAppBar> = (props) => {
     const classes = useStyles();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
     const [user, setUser] = React.useState<null | User>(null);
+
     useEffect(() => {
         props.backend.getUser(getCookie("token"), new class implements IHttpResponsible {
             onResponse(code: number, response: any) {
@@ -98,8 +110,19 @@ export const MainAppBar: React.FC<IBackendable> = (props) => {
         <div className={classes.grow}>
             <AppBar position="static">
                 <Toolbar>
+                    <Fade in={props.backButtonVisibility}>
+                        <IconButton
+                            edge="start"
+                            className={classes.menuButton}
+                            color="inherit"
+                            aria-label="menu"
+                            onClick={props.onBackButtonClick}
+                        >
+                            <ArrowBackIcon/>
+                        </IconButton>
+                    </Fade>
                     <Typography className={classes.title} variant="h6" noWrap>
-                        Группы
+                        {props.title}
                     </Typography>
                     <div className={classes.grow}/>
                     <div className={classes.sectionDesktop}>
