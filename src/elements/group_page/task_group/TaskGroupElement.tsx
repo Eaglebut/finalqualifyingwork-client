@@ -11,13 +11,14 @@ const useStyles = makeStyles((theme) => ({
 
     grid: {
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
     },
     div: {
-        padding: "15px"
+        padding: "15px",
     },
     name: {
-        fontSize: "16px"
+        fontSize: "16px",
+        marginBottom: "5px",
     },
 
 
@@ -46,12 +47,14 @@ export const TaskGroupElement: React.FC<ITaskGroupElement> = (props) => {
                 {taskGroup.name}
             </Typography>
             <Grid container className={classes.grid} spacing={1}>
-                {taskGroup.taskList.map((task) => (
+                {taskGroup.taskList.map((task, index) => (
                     <TaskElement
                         task={task}
                         backend={props.backend}
                         groupId={props.groupId}
                         taskGroupId={props.taskGroup.taskGroupId}
+                        position={index}
+                        setTaskList={setTaskList}
                     />
                 ))}
                 <AddTaskElement

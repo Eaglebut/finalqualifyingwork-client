@@ -4,6 +4,7 @@ import RegisterRequestDto from "../dto/register/RegisterRequestDto";
 import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 import PostGroupDto from "../dto/group/PostGroupDto";
 import {CreateTaskDto} from "../dto/task/CreateTaskDto";
+import EditTaskDto from "../dto/task/EditTaskDto";
 
 
 export default class BackendDao implements IBackendDao {
@@ -60,11 +61,29 @@ export default class BackendDao implements IBackendDao {
         this.sendRequest("GET", "group/" + groupId, null, response, token);
     }
 
-    createTask(token: string, groupId: number, taskGroupId: number, dto: CreateTaskDto, response: IHttpResponsible) {
+    createTask(token: string, groupId: number, taskGroupId: number, dto: CreateTaskDto, response: IHttpResponsible): void {
         this.sendRequest(
             "POST",
             "group/" + groupId + "/taskGroup/" + taskGroupId + "/task",
             dto,
+            response,
+            token);
+    }
+
+    editTask(token: string, taskId: number, groupId: number, taskGroupId: number, dto: EditTaskDto, response: IHttpResponsible): void {
+        this.sendRequest(
+            "PUT",
+            "group/" + groupId + "/taskGroup/" + taskGroupId + "/task/" + taskId,
+            dto,
+            response,
+            token);
+    }
+
+    deleteTask(token: string, taskId: number, groupId: number, taskGroupId: number, response: IHttpResponsible): void {
+        this.sendRequest(
+            "DELETE",
+            "group/" + groupId + "/taskGroup/" + taskGroupId + "/task/" + taskId,
+            null,
             response,
             token);
     }

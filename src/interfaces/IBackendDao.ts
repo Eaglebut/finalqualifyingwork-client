@@ -1,6 +1,7 @@
 import {IHttpResponsible} from "./IHttpResponsible";
 import PostGroupDto from "../dto/group/PostGroupDto";
 import {CreateTaskDto} from "../dto/task/CreateTaskDto";
+import EditTaskDto from "../dto/task/EditTaskDto";
 
 export interface IBackendDao {
 
@@ -19,4 +20,8 @@ export interface IBackendDao {
     getGroup(token: string, groupId: number, response: IHttpResponsible): void;
 
     createTask(token: string, groupId: number, taskGroupId: number, dto: CreateTaskDto, response: IHttpResponsible): void;
+
+    editTask(token: string, taskId: number, groupId: number, taskGroupId: number, dto: EditTaskDto, response: IHttpResponsible): void;
+
+    deleteTask(token: string, taskId: number, groupId: number, taskGroupId: number, response: IHttpResponsible): void
 }
