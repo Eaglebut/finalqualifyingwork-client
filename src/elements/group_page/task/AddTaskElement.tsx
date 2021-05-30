@@ -10,11 +10,11 @@ import Task from "../../../model/Task";
 import {TaskInput} from "./TaskInput";
 
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     grid: {},
     div: {
-        margin: "10px",
         padding: "10px",
+        cursor: "pointer",
     },
     textGrid: {
         display: "flex",
@@ -46,8 +46,6 @@ const useStyles = makeStyles((theme) => ({
 interface IAddTaskElement extends IBackendable {
     groupId: number;
     taskGroupId: number;
-
-    onClick(): void;
 
     setTaskList(taskList: Array<Task>): void;
 }

@@ -5,6 +5,8 @@ import {IHttpResponsible} from "../interfaces/IHttpResponsible";
 import PostGroupDto from "../dto/group/PostGroupDto";
 import {CreateTaskDto} from "../dto/task/CreateTaskDto";
 import EditTaskDto from "../dto/task/EditTaskDto";
+import CreateTaskGroupDto from "../dto/task_group/CreateTaskGroupDto";
+import EditTaskGroupDto from "../dto/task_group/EditTaskGroupDto";
 
 
 export default class BackendDao implements IBackendDao {
@@ -83,6 +85,33 @@ export default class BackendDao implements IBackendDao {
         this.sendRequest(
             "DELETE",
             "group/" + groupId + "/taskGroup/" + taskGroupId + "/task/" + taskId,
+            null,
+            response,
+            token);
+    }
+
+    createTaskGroup(token: string, groupId: number, dto: CreateTaskGroupDto, response: IHttpResponsible): void {
+        this.sendRequest(
+            "POST",
+            "group/" + groupId + "/taskGroup",
+            dto,
+            response,
+            token);
+    }
+
+    editTaskGroup(token: string, groupId: number, taskGroupId: number, dto: EditTaskGroupDto, response: IHttpResponsible): void {
+        this.sendRequest(
+            "PUT",
+            "group/" + groupId + "/taskGroup/" + taskGroupId,
+            dto,
+            response,
+            token);
+    }
+
+    deleteTaskGroup(token: string, groupId: number, taskGroupId: number, response: IHttpResponsible): void {
+        this.sendRequest(
+            "DELETE",
+            "group/" + groupId + "/taskGroup/" + taskGroupId,
             null,
             response,
             token);

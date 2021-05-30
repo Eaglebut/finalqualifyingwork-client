@@ -10,8 +10,10 @@ import {getCookie} from "../../../util/CookieUtil";
 import EditTaskDto from "../../../dto/task/EditTaskDto";
 import {IHttpResponsible} from "../../../interfaces/IHttpResponsible";
 
-const useStyles = makeStyles((theme) => ({
-    grid: {},
+const useStyles = makeStyles(() => ({
+    grid: {
+        alignSelf: "center",
+    },
     div: {
         padding: "5px"
     },
@@ -19,16 +21,20 @@ const useStyles = makeStyles((theme) => ({
     name: {
         fontSize: "16px",
         overflowWrap: "break-word",
+        wordWrap: "break-word",
+        wordBreak: "break-word",
     },
     text: {
         fontSize: "14px",
         overflowWrap: "break-word",
-
+        wordWrap: "break-word",
+        wordBreak: "break-word",
     },
     gridWithButtons: {
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        flexWrap: "nowrap"
     },
 
     buttons: {
@@ -63,18 +69,12 @@ interface ITaskElement extends IBackendable {
     setTaskList(taskList: Array<Task>): void;
 }
 
-function chunkString(str: string, length: number) {
-    return str.match(new RegExp('.{1,' + length + '}', 'g'));
-}
 
 export const TaskElement: React.FC<ITaskElement> = (props) => {
 
     const classes = useStyles();
     const [isMouseOver, setIsMouseOver] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
-
-    const chunkedName = chunkString(props.task.name, isMouseOver ? 16 : 21);
-    const chunkedText = chunkString(props.task.text, isMouseOver ? 16 : 21);
 
     const onCancelClick = () => {
         setIsEdit(false);
@@ -119,8 +119,8 @@ export const TaskElement: React.FC<ITaskElement> = (props) => {
             className={classes.grid}
             item
             key={props.task.taskId}
-            onMouseOver={event => setIsMouseOver(true)}
-            onMouseLeave={event => setIsMouseOver(false)}
+            onMouseOver={() => setIsMouseOver(true)}
+            onMouseLeave={() => setIsMouseOver(false)}
         >
             <Paper variant={"elevation"}
                    className={classes.div}
@@ -130,16 +130,13 @@ export const TaskElement: React.FC<ITaskElement> = (props) => {
                     <Grid item className={classes.textItem}>
                         <Grid container className={classes.textContainer}
                         >
-                            {!isEdit && chunkedName?.map(value => {
-                                return (<Typography className={classes.name}>
-                                    {value}
-                                </Typography>)
-                            })}
-                            {!isEdit && chunkedText?.map(value => {
-                                return (<Typography className={classes.text}>
-                                    {value}
-                                </Typography>)
-                            })}
+                            {!isEdit && <Typography className={classes.name}>
+                                {props.task.name}
+                            </Typography>
+                            }
+                            {!isEdit && <Typography className={classes.text}>
+                                {props.task.text}
+                            </Typography>}
 
                             {isEdit && <TaskInput
                                 name={props.task.name}

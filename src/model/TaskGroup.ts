@@ -25,7 +25,6 @@ export default class TaskGroup {
     }
 
     public static fromJson(json: any): TaskGroup {
-        console.log(json)
         return new TaskGroup(json.id, json.name, Task.fromJsonArray(json.taskList), json.position);
     }
 

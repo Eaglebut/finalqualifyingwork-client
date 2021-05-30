@@ -20,21 +20,20 @@ const useStyles = makeStyles(() => ({
 }));
 
 
-interface ITaskInput {
+interface ITaskGroupInput {
     name: string;
-    text: string;
 
-    onSaveClick(name: string, text: string): void;
+    onSaveClick(name: string): void;
 
     onCancelClick(): void;
 }
 
-export const TaskInput: React.FC<ITaskInput> = (props) => {
+export const TaskGroupInput: React.FC<ITaskGroupInput> = (props) => {
 
     const classes = useStyles();
 
-    const [taskName, setTaskName] = useState<string>(props.name);
-    const [taskText, setTaskText] = useState<string>(props.text);
+    const [taskGroupName, setTaskGroupName] = useState<string>(props.name);
+
 
     return (
         <Grid container className={classes.inputGrid}>
@@ -42,19 +41,9 @@ export const TaskInput: React.FC<ITaskInput> = (props) => {
                 <TextField
                     multiline
                     size={"small"}
-                    label={"Название задачи"}
-                    onChange={event => setTaskName(event.target.value)}
-                    value={taskName}
-                    fullWidth
-                />
-            </Grid>
-            <Grid item>
-                <TextField
-                    size={"small"}
-                    label={"Описание задачи"}
-                    multiline
-                    onChange={event => setTaskText(event.target.value)}
-                    value={taskText}
+                    label={"Название группы задач"}
+                    onChange={event => setTaskGroupName(event.target.value)}
+                    value={taskGroupName}
                     fullWidth
                 />
             </Grid>
@@ -69,7 +58,7 @@ export const TaskInput: React.FC<ITaskInput> = (props) => {
                     </Grid>
                     <Grid item>
                         <IconButton
-                            onClick={() => props.onSaveClick(taskName, taskText)}
+                            onClick={() => props.onSaveClick(taskGroupName)}
                         >
                             <Save className={classes.icon}/>
                         </IconButton>

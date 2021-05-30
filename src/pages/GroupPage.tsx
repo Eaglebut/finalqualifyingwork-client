@@ -31,7 +31,7 @@ export const GroupPage: React.FC<IBackendable> = (props) => {
                 }
             }
         }())
-    }, []);
+    }, [groupId, props.backend]);
 
     const onBackClick = () => {
         history.goBack();
@@ -48,7 +48,7 @@ export const GroupPage: React.FC<IBackendable> = (props) => {
             <TaskGroupContainer
                 groupId={group === undefined ? 0 : group.groupId}
                 backend={props.backend}
-                taskGroup={group === undefined ? new Array<TaskGroup>() : group.taskGroups}
+                taskGroups={group === undefined ? new Array<TaskGroup>() : group.taskGroups}
                 //setGroup={setGroup}
             />
         </div>
