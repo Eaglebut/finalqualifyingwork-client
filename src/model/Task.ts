@@ -6,13 +6,15 @@ export default class Task {
     public name: string;
     public text: string;
     public author: User;
+    public position?: number;
 
 
-    constructor(taskId: number, name: string, text: string, author: User) {
+    constructor(taskId: number, name: string, text: string, author: User, position ?: number) {
         this.taskId = taskId;
         this.name = name;
         this.text = text;
         this.author = author;
+        this.position = position;
     }
 
     public static fromJsonArray(json: any): Array<Task> {
@@ -26,7 +28,7 @@ export default class Task {
     }
 
     public static fromJson(json: any): Task {
-        return new Task(json.id, json.name, json.text, User.fromJson(json.author))
+        return new Task(json.id, json.name, json.text, User.fromJson(json.author), json.position)
     }
 
 }

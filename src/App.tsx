@@ -5,6 +5,7 @@ import RegisterPage from "./pages/RegisterPage";
 import GroupListPage from "./pages/GroupListPage";
 import BackendDao from "./dao/BackendDao";
 import {GroupPage} from "./pages/GroupPage";
+import {TestPage} from "./tests/TestPage";
 
 
 class App extends React.Component {
@@ -30,6 +31,9 @@ class App extends React.Component {
                         </Route>
                         <Route path="/group/:groupId" exact>
                             <GroupPage backend={backend}/>
+                        </Route>
+                        <Route path="/test" exact>
+                            <TestPage backend={backend}/>
                         </Route>
                     </Switch>
                 </Router>
