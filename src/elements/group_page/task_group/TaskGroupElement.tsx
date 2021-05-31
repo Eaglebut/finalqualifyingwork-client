@@ -12,6 +12,7 @@ import {TaskGroupInput} from "./TaskGroupInput";
 import {getCookie} from "../../../util/CookieUtil";
 import EditTaskGroupDto from "../../../dto/task_group/EditTaskGroupDto";
 import {IHttpResponsible} from "../../../interfaces/IHttpResponsible";
+import {Draggable, Droppable} from "react-beautiful-dnd";
 
 const useStyles = makeStyles(() => ({
 
@@ -48,22 +49,19 @@ interface ITaskGroupElement extends IBackendable {
     groupId: number;
     position: number;
 
-    setTaskGroupList(taskGroupList: Array<TaskGroup>): void;
+    setTaskGroups(taskGroups: Array<TaskGroup>): void;
+
+    setTaskGroup(taskGroup: TaskGroup, position: number): void;
+
+    setTaskList(taskList: Array<Task>, taskGroup: TaskGroup): void
+
 }
 
 export const TaskGroupElement: React.FC<ITaskGroupElement> = (props) => {
     const classes = useStyles();
 
-    const [taskGroup, setTaskGroup] = useState<TaskGroup>(props.taskGroup);
     const [isMouseOver, setIsMouseOver] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
-
-
-    const setTaskList = (taskList: Array<Task>) => {
-        setTaskGroup(prevState => {
-            return new TaskGroup(prevState.taskGroupId, prevState.name, taskList, prevState.position);
-        })
-    }
 
     const onCancelClick = () => {
         setIsEdit(false);
@@ -73,14 +71,13 @@ export const TaskGroupElement: React.FC<ITaskGroupElement> = (props) => {
         props.backend.editTaskGroup(
             getCookie("token"),
             props.groupId,
-            taskGroup.taskGroupId,
+            props.taskGroup.taskGroupId,
             new EditTaskGroupDto(name, props.position),
             new class implements IHttpResponsible {
                 onResponse(code: number, response: any) {
                     if (code === 200) {
-                        props.setTaskGroupList(TaskGroup.fromJsonArray(JSON.parse(response)));
+                        props.setTaskGroups(TaskGroup.fromJsonArray(JSON.parse(response)));
                         setIsEdit(false);
-                        setTaskGroup(TaskGroup.fromJsonArray(JSON.parse(response))[props.position]);
                     } else {
                         alert(code + " " + response);
                     }
@@ -93,11 +90,11 @@ export const TaskGroupElement: React.FC<ITaskGroupElement> = (props) => {
         props.backend.deleteTaskGroup(
             getCookie("token"),
             props.groupId,
-            taskGroup.taskGroupId,
+            props.taskGroup.taskGroupId,
             new class implements IHttpResponsible {
                 onResponse(code: number, response: any) {
                     if (code === 200) {
-                        props.setTaskGroupList(TaskGroup.fromJsonArray(JSON.parse(response)));
+                        props.setTaskGroups(TaskGroup.fromJsonArray(JSON.parse(response)));
                         setIsEdit(false);
                     } else {
                         alert(code + " " + response);
@@ -109,63 +106,103 @@ export const TaskGroupElement: React.FC<ITaskGroupElement> = (props) => {
 
 
     return (
-        <Paper className={classes.div}>
-            {
-                isEdit ?
-                    <TaskGroupInput
-                        onCancelClick={onCancelClick}
-                        onSaveClick={onSaveClick}
-                        name={taskGroup.name}
-                    />
-                    :
+        <Draggable draggableId={props.groupId + " " + props.taskGroup.taskGroupId} index={props.position}>
+            {provided => (
+                <Paper
+                    key={"paper" + props.taskGroup.taskGroupId}
+                    className={classes.div}
+                    innerRef={provided.innerRef}
+                    {...provided.dragHandleProps}
+                    {...provided.draggableProps}
+                >
+                    {
+                        isEdit ?
+                            <TaskGroupInput
+                                onCancelClick={onCancelClick}
+                                onSaveClick={onSaveClick}
+                                name={props.taskGroup.name}
+                            />
+                            :
+
+                            <Grid
+                                container
+                                className={classes.titleGrid}
+                                onMouseOver={() => setIsMouseOver(true)}
+                                onMouseLeave={() => setIsMouseOver(false)}
+                            >
+                                <Grid item>
+                                    <Typography variant={"h4"} className={classes.name}>
+                                        {props.taskGroup.name}
+                                    </Typography>
+                                </Grid>
+                                {
+                                    isMouseOver &&
+                                    <Zoom in={true}>
+                                        <Grid item>
+                                            <IconButton onClick={() => setIsEdit(true)}>
+                                                <EditIcon className={classes.icon}/>
+                                            </IconButton>
+                                            <IconButton onClick={onDeleteClick}>
+                                                <DeleteIcon className={classes.icon}/>
+                                            </IconButton>
+                                        </Grid>
+                                    </Zoom>
+                                }
+                            </Grid>
+                    }
+
+
                     <Grid
                         container
-                        className={classes.titleGrid}
-                        onMouseOver={() => setIsMouseOver(true)}
-                        onMouseLeave={() => setIsMouseOver(false)}
+                        className={classes.grid}
+                        spacing={1}
                     >
-                        <Grid item>
-                            <Typography variant={"h4"} className={classes.name}>
-                                {taskGroup.name}
-                            </Typography>
+                        <Grid item xs={12} sm={12} md={12}>
+                            <Droppable
+                                key={"" + props.taskGroup.position}
+                                droppableId={"" + props.taskGroup.position}
+                                type="row"
+                            >
+                                {(provided, snapshot) => (
+                                    <div
+                                        key={"TaskGroupDroppableDiv" + props.taskGroup.position}
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                    >
+                                        <Grid
+                                            container
+                                            className={classes.grid}
+                                            spacing={1}
+                                        >
+                                            {props.taskGroup.taskList.map((task, index) => (
+                                                <Grid key={"t" + index} item xs={12} sm={12} md={12}>
+                                                    <TaskElement
+                                                        task={task}
+                                                        backend={props.backend}
+                                                        groupId={props.groupId}
+                                                        taskGroup={props.taskGroup}
+                                                        position={index}
+                                                        setTaskList={props.setTaskList}
+                                                    />
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
                         </Grid>
-                        {
-                            isMouseOver &&
-                            <Zoom in={true}>
-                                <Grid item>
-                                    <IconButton onClick={() => setIsEdit(true)}>
-                                        <EditIcon className={classes.icon}/>
-                                    </IconButton>
-                                    <IconButton onClick={onDeleteClick}>
-                                        <DeleteIcon className={classes.icon}/>
-                                    </IconButton>
-                                </Grid>
-                            </Zoom>
-                        }
+                        <Grid item xs={12} sm={12} md={12}>
+                            <AddTaskElement
+                                backend={props.backend}
+                                groupId={props.groupId}
+                                taskGroup={props.taskGroup}
+                                setTaskList={props.setTaskList}
+                            />
+                        </Grid>
                     </Grid>
-            }
-            <Grid container className={classes.grid} spacing={1}>
-                {taskGroup.taskList.map((task, index) => (
-                    <Grid key={"t" + index} item xs={12} sm={12} md={12}>
-                        <TaskElement
-                            task={task}
-                            backend={props.backend}
-                            groupId={props.groupId}
-                            taskGroupId={taskGroup.taskGroupId}
-                            position={index}
-                            setTaskList={setTaskList}
-                        />
-                    </Grid>
-                ))}
-                <Grid item xs={12} sm={12} md={12}>
-                    <AddTaskElement
-                        backend={props.backend}
-                        groupId={props.groupId}
-                        taskGroupId={props.taskGroup.taskGroupId}
-                        setTaskList={setTaskList}
-                    />
-                </Grid>
-            </Grid>
-        </Paper>
+                </Paper>)}
+        </Draggable>
     );
 }

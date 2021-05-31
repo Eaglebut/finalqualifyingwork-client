@@ -9,6 +9,8 @@ import {TaskInput} from "./TaskInput";
 import {getCookie} from "../../../util/CookieUtil";
 import EditTaskDto from "../../../dto/task/EditTaskDto";
 import {IHttpResponsible} from "../../../interfaces/IHttpResponsible";
+import {Draggable} from "react-beautiful-dnd";
+import TaskGroup from "../../../model/TaskGroup";
 
 const useStyles = makeStyles(() => ({
     grid: {
@@ -63,10 +65,10 @@ const useStyles = makeStyles(() => ({
 interface ITaskElement extends IBackendable {
     task: Task;
     groupId: number;
-    taskGroupId: number;
+    taskGroup: TaskGroup;
     position: number;
 
-    setTaskList(taskList: Array<Task>): void;
+    setTaskList(taskList: Array<Task>, taskGroup: TaskGroup): void
 }
 
 
@@ -85,12 +87,12 @@ export const TaskElement: React.FC<ITaskElement> = (props) => {
             getCookie("token"),
             props.task.taskId,
             props.groupId,
-            props.taskGroupId,
-            new EditTaskDto(name, text, props.position, props.taskGroupId),
+            props.taskGroup.taskGroupId,
+            new EditTaskDto(name, text, props.position, props.taskGroup.taskGroupId),
             new class implements IHttpResponsible {
                 onResponse(code: number, response: any) {
                     if (code === 200) {
-                        props.setTaskList(Task.fromJsonArray(JSON.parse(response)));
+                        props.setTaskList(Task.fromJsonArray(JSON.parse(response)), props.taskGroup);
                     } else alert(code + " " + response);
                 }
             }()
@@ -103,11 +105,11 @@ export const TaskElement: React.FC<ITaskElement> = (props) => {
             getCookie("token"),
             props.task.taskId,
             props.groupId,
-            props.taskGroupId,
+            props.taskGroup.taskGroupId,
             new class implements IHttpResponsible {
                 onResponse(code: number, response: any) {
                     if (code === 200) {
-                        props.setTaskList(Task.fromJsonArray(JSON.parse(response)));
+                        props.setTaskList(Task.fromJsonArray(JSON.parse(response)), props.taskGroup);
                     } else alert(code + " " + response);
                 }
             }()
@@ -115,59 +117,73 @@ export const TaskElement: React.FC<ITaskElement> = (props) => {
     }
 
     return (
-        <Grid
-            className={classes.grid}
-            item
-            key={props.task.taskId}
-            onMouseOver={() => setIsMouseOver(true)}
-            onMouseLeave={() => setIsMouseOver(false)}
-        >
-            <Paper variant={"elevation"}
-                   className={classes.div}
-            >
-                <Grid container className={classes.gridWithButtons}
+        <Draggable
+            draggableId={"" + props.task.taskId}
+            key={"" + props.task.taskId}
+            index={props.position}>
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
                 >
-                    <Grid item className={classes.textItem}>
-                        <Grid container className={classes.textContainer}
-                        >
-                            {!isEdit && <Typography className={classes.name}>
-                                {props.task.name}
-                            </Typography>
-                            }
-                            {!isEdit && <Typography className={classes.text}>
-                                {props.task.text}
-                            </Typography>}
-
-                            {isEdit && <TaskInput
-                                name={props.task.name}
-                                text={props.task.text}
-                                onCancelClick={onCancelClick}
-                                onSaveClick={onSaveClick}
-                            />}
-                        </Grid>
-                    </Grid>
-                    {!isEdit && isMouseOver &&
-                    <Grid item className={classes.grid}
+                    <Grid
+                        className={classes.grid}
+                        item
+                        key={props.task.taskId}
+                        onMouseOver={() => setIsMouseOver(true)}
+                        onMouseLeave={() => setIsMouseOver(false)}
                     >
-                        <Zoom in={isMouseOver}>
-                            <Grid container className={classes.iconGrid}>
-                                <IconButton
-                                    onClick={() => setIsEdit(true)}
+
+                        <Paper variant={"elevation"}
+                               className={classes.div}
+                        >
+                            <Grid container className={classes.gridWithButtons}
+                            >
+                                <Grid item className={classes.textItem}>
+                                    <Grid container className={classes.textContainer}
+                                    >
+                                        {!isEdit && <Typography className={classes.name}>
+                                            {props.task.name}
+                                        </Typography>
+                                        }
+                                        {!isEdit && <Typography className={classes.text}>
+                                            {props.task.text}
+                                        </Typography>}
+
+                                        {isEdit && <TaskInput
+                                            name={props.task.name}
+                                            text={props.task.text}
+                                            onCancelClick={onCancelClick}
+                                            onSaveClick={onSaveClick}
+                                        />}
+                                    </Grid>
+                                </Grid>
+                                {!isEdit && isMouseOver &&
+                                <Grid item className={classes.grid}
                                 >
-                                    <EditIcon className={classes.icon}/>
-                                </IconButton>
-                                <IconButton
-                                    onClick={onDeleteClick}
-                                >
-                                    <DeleteIcon className={classes.icon}/>
-                                </IconButton>
+                                    <Zoom in={isMouseOver}>
+                                        <Grid container className={classes.iconGrid}>
+                                            <IconButton
+                                                onClick={() => setIsEdit(true)}
+                                            >
+                                                <EditIcon className={classes.icon}/>
+                                            </IconButton>
+                                            <IconButton
+                                                onClick={onDeleteClick}
+                                            >
+                                                <DeleteIcon className={classes.icon}/>
+                                            </IconButton>
+                                        </Grid>
+                                    </Zoom>
+                                </Grid>
+                                }
                             </Grid>
-                        </Zoom>
+                        </Paper>
+
                     </Grid>
-                    }
-                </Grid>
-            </Paper>
-        </Grid>
+                </div>)}
+        </Draggable>
     );
 }
 

@@ -8,6 +8,7 @@ import {IHttpResponsible} from "../../../interfaces/IHttpResponsible";
 import {CreateTaskDto} from "../../../dto/task/CreateTaskDto";
 import Task from "../../../model/Task";
 import {TaskInput} from "./TaskInput";
+import TaskGroup from "../../../model/TaskGroup";
 
 
 const useStyles = makeStyles(() => ({
@@ -45,9 +46,9 @@ const useStyles = makeStyles(() => ({
 
 interface IAddTaskElement extends IBackendable {
     groupId: number;
-    taskGroupId: number;
+    taskGroup: TaskGroup;
 
-    setTaskList(taskList: Array<Task>): void;
+    setTaskList(taskList: Array<Task>, taskGroup: TaskGroup): void
 }
 
 export const AddTaskElement: React.FC<IAddTaskElement> = (props) => {
@@ -64,12 +65,12 @@ export const AddTaskElement: React.FC<IAddTaskElement> = (props) => {
         props.backend.createTask(
             getCookie("token"),
             props.groupId,
-            props.taskGroupId,
+            props.taskGroup.taskGroupId,
             new CreateTaskDto(name, text, -1),
             new class implements IHttpResponsible {
                 onResponse(code: number, response: any) {
                     if (code === 200) {
-                        props.setTaskList(Task.fromJsonArray(JSON.parse(response)));
+                        props.setTaskList(Task.fromJsonArray(JSON.parse(response)), props.taskGroup);
                     } else alert(code + " " + response);
                 }
             }());
